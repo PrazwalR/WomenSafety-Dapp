@@ -1,39 +1,46 @@
 # Women Safety DApp - Network Configuration
 
-## ✅ SEPOLIA TESTNET CONFIGURED
+## ✅ HOLESKY TESTNET CONFIGURED
 
-This project is **CONFIRMED** to be configured for **Sepolia Ethereum Testnet**, not mainnet or any other network.
+This project is **CONFIRMED** to be configured for **Holesky Ethereum Testnet**, not mainnet or any other network.
 
 ### Network Details:
-- **Primary Network**: Sepolia Testnet
-- **Chain ID**: `0xaa36a7` (11155111 in decimal)
-- **Network Name**: Sepolia Test Network
-- **Currency**: SepoliaETH (ETH)
+- **Primary Network**: Holesky Testnet
+- **Chain ID**: `0x4268` (17000 in decimal)
+- **Network Name**: Holesky Test Network
+- **Currency**: HoleskyETH (ETH)
 
 ### Configuration Files:
 - `src/contracts/contractConfig.js` - Primary network configuration
 - `src/context/Web3Context.jsx` - Automatic network switching
 
 ### Key Features:
-1. **Automatic Network Detection**: App checks if user is on Sepolia
-2. **Automatic Network Switching**: Prompts user to switch to Sepolia if needed
+1. **Automatic Network Detection**: App checks if user is on Holesky
+2. **Automatic Network Switching**: Prompts user to switch to Holesky if needed
 3. **Network Change Handling**: Responds to manual network changes
 4. **Safe Testing Environment**: Uses testnet to avoid real ETH transactions
 
 ### Contract Information:
-- **Contract Address**: 0x282c3BeF7c2733c1B89940efFac611cf623276e9
-- **Network**: Sepolia Testnet
-- **Admin Address**: 0x8ba1f109551bD432803012645Hac136c60143dF
+- **Contract Address**: 0x725FEAf51aCb34995cce6573E65D4Fa0BECAAF53
+- **Network**: Holesky Testnet
+- **Admin Address**: 0xaE0CCAC79AfFE82c8d736b1Eaa8351fe9E0f1A23
 
 ### RPC Endpoints (Fallback):
-- `https://rpc.sepolia.org`
-- `https://ethereum-sepolia.blockpi.network/v1/rpc/public`
-- Infura Sepolia endpoint (requires API key)
+- `https://ethereum-holesky.blockpi.network/v1/rpc/public`
+- `https://rpc.holesky.ethpandaops.io`
+- `https://holesky.drpc.org`
+
+### Block Explorer:
+- `https://holesky.etherscan.io`
 
 ### Testing:
-- Application running on: http://localhost:3001
+- Application running on: http://localhost:3000
 - All components compiled successfully
-- Ready for MetaMask integration on Sepolia testnet
+- Ready for MetaMask integration on Holesky testnet
+
+### Get Test ETH:
+- **Holesky Faucet 1**: https://holesky-faucet.pk910.de/
+- **Holesky Faucet 2**: https://faucet.quicknode.com/ethereum/holesky
 
 ---
-**IMPORTANT**: This is a TESTNET configuration. No real ETH will be used. Only Sepolia testnet ETH (free) is required for transactions.
+**IMPORTANT**: This is a TESTNET configuration. No real ETH will be used. Only Holesky testnet ETH (free) is required for transactions.

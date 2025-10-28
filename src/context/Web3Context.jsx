@@ -6,7 +6,7 @@ import {
     checkUserAdmin,
     registerUser,
 } from '../utils/ethereum';
-import { ADMIN_ADDRESS, NETWORK_CONFIG, switchToSepoliaNetwork, isSepoliaNetwork } from '../contracts/contractConfig';
+import { ADMIN_ADDRESS, NETWORK_CONFIG, switchToHoleskyNetwork, isHoleskyNetwork } from '../contracts/contractConfig';
 import { ERROR_MESSAGES, SUCCESS_MESSAGES } from '../utils/constants';
 import toast from 'react-hot-toast';
 
@@ -77,16 +77,14 @@ export const Web3Provider = ({ children }) => {
 
             // Chain changed
             window.ethereum.on('chainChanged', async (chainId) => {
-                // Check if switched to Sepolia
+                // Check if switched to Holesky
                 if (chainId === NETWORK_CONFIG.chainId) {
-                    toast.success('Connected to Sepolia network');
+                    toast.success('Connected to Holesky network');
                 } else {
-                    toast.error('Please switch to Sepolia network for full functionality');
+                    toast.error('Please switch to Holesky network for full functionality');
                 }
                 window.location.reload();
-            });
-
-            // Disconnect
+            });            // Disconnect
             window.ethereum.on('disconnect', () => {
                 handleDisconnect();
             });
@@ -116,15 +114,13 @@ export const Web3Provider = ({ children }) => {
             setLoading(true);
             const connectedAccount = await connectWallet();
 
-            // Check if user is on Sepolia network
-            const isCorrectNetwork = await isSepoliaNetwork();
+            // Check if user is on Holesky network
+            const isCorrectNetwork = await isHoleskyNetwork();
             if (!isCorrectNetwork) {
-                toast.loading('Switching to Sepolia network...', { id: 'network-switch' });
-                await switchToSepoliaNetwork();
-                toast.success('Connected to Sepolia network', { id: 'network-switch' });
-            }
-
-            setAccount(connectedAccount);
+                toast.loading('Switching to Holesky network...', { id: 'network-switch' });
+                await switchToHoleskyNetwork();
+                toast.success('Connected to Holesky network', { id: 'network-switch' });
+            } setAccount(connectedAccount);
             setIsConnected(true);
 
             toast.success(SUCCESS_MESSAGES.WALLET_CONNECTED);
@@ -135,7 +131,7 @@ export const Web3Provider = ({ children }) => {
             if (error.message.includes('User rejected')) {
                 toast.error(ERROR_MESSAGES.CONNECTION_REJECTED);
             } else if (error.message.includes('network')) {
-                toast.error('Please switch to Sepolia network to continue');
+                toast.error('Please switch to Holesky network to continue');
             } else {
                 toast.error(error.message || ERROR_MESSAGES.WALLET_NOT_FOUND);
             }

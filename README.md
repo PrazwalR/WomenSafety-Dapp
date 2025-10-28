@@ -215,8 +215,8 @@ The application is fully responsive and optimized for:
 
 ### Testing with MetaMask
 
-1. Connect to Ethereum testnet (Sepolia recommended)
-2. Ensure test ETH in wallet for gas fees
+1. Connect to Ethereum testnet (Holesky testnet)
+2. Ensure test ETH in wallet for gas fees (use faucets listed in NETWORK_CONFIGURATION.md)
 3. Test all contract interactions
 4. Verify transaction confirmations
 

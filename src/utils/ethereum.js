@@ -1,5 +1,5 @@
 import { ethers } from 'ethers';
-import { CONTRACT_ADDRESS, isSepoliaNetwork, switchToSepoliaNetwork } from '../contracts/contractConfig';
+import { CONTRACT_ADDRESS, isHoleskyNetwork, switchToHoleskyNetwork } from '../contracts/contractConfig';
 import WomenSafetyABI from '../contracts/WomenSafety.json';
 import { ERROR_MESSAGES } from './constants';
 import toast from 'react-hot-toast';
@@ -86,12 +86,12 @@ export const connectWallet = async () => {
             throw new Error('No accounts found');
         }
 
-        // Check if on Sepolia network
-        const isCorrectNetwork = await isSepoliaNetwork();
+        // Check if on Holesky network
+        const isCorrectNetwork = await isHoleskyNetwork();
         if (!isCorrectNetwork) {
-            toast.loading('Switching to Sepolia network...', { id: 'network' });
-            await switchToSepoliaNetwork();
-            toast.success('Connected to Sepolia network', { id: 'network' });
+            toast.loading('Switching to Holesky network...', { id: 'network' });
+            await switchToHoleskyNetwork();
+            toast.success('Connected to Holesky network', { id: 'network' });
         }
 
         // Initialize provider and signer
@@ -132,11 +132,9 @@ export const registerUser = async () => {
     try {
         // First check if we're on the correct network
         const chainId = await window.ethereum.request({ method: 'eth_chainId' });
-        if (chainId !== '0xaa36a7') {
-            throw new Error('Please switch to Sepolia testnet to register');
-        }
-
-        // Get fresh contract instance
+        if (chainId !== '0x4268') { // Holesky testnet chain ID
+            throw new Error('Please switch to Holesky testnet to register');
+        }        // Get fresh contract instance
         const contractInstance = await getContract();
 
         // Add gas estimation for better error handling
@@ -173,11 +171,11 @@ export const registerUser = async () => {
         } else if (error.message.includes('user rejected')) {
             toast.error('Transaction cancelled by user', { id: 'registration' });
         } else if (error.message.includes('insufficient funds')) {
-            toast.error('Insufficient ETH for transaction. Please add Sepolia testnet ETH.', { id: 'registration' });
+            toast.error('Insufficient ETH for transaction. Please add Holesky testnet ETH.', { id: 'registration' });
         } else if (error.message.includes('already registered')) {
             toast.error('User already registered', { id: 'registration' });
         } else if (error.message.includes('network')) {
-            toast.error('Please switch to Sepolia testnet', { id: 'registration' });
+            toast.error('Please switch to Holesky testnet', { id: 'registration' });
         } else {
             toast.error('Registration failed: ' + (error.reason || error.message), { id: 'registration' });
         }
