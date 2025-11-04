@@ -1,5 +1,5 @@
 import { ethers } from 'ethers';
-import { CONTRACT_ADDRESS, isHoleskyNetwork, switchToHoleskyNetwork } from '../contracts/contractConfig';
+import { CONTRACT_ADDRESS, isSepoliaNetwork, switchToSepoliaNetwork } from '../contracts/contractConfig';
 import WomenSafetyABI from '../contracts/WomenSafety.json';
 import { ERROR_MESSAGES } from './constants';
 import toast from 'react-hot-toast';
@@ -66,6 +66,39 @@ export const getReadOnlyContract = () => {
     return new ethers.Contract(CONTRACT_ADDRESS, WomenSafetyABI.abi, provider);
 };
 
+// Verify contract exists at address
+export const verifyContractDeployment = async () => {
+    try {
+        if (!window.ethereum) {
+            throw new Error('MetaMask not installed');
+        }
+
+        const tempProvider = new ethers.BrowserProvider(window.ethereum);
+        const network = await tempProvider.getNetwork();
+        const code = await tempProvider.getCode(CONTRACT_ADDRESS);
+
+        console.log('🔍 Contract Verification:');
+        console.log('Network:', network.name, '(Chain ID:', network.chainId.toString() + ')');
+        console.log('Contract Address:', CONTRACT_ADDRESS);
+        console.log('Contract Code Length:', code.length);
+
+        if (code === '0x') {
+            console.error('❌ NO CONTRACT FOUND at this address!');
+            console.error('Please check:');
+            console.error('1. Is contract deployed on current network?');
+            console.error('2. Is contract address correct?');
+            console.error('3. Verify at: https://sepolia.etherscan.io/address/' + CONTRACT_ADDRESS);
+            return false;
+        } else {
+            console.log('✅ Contract found! Code exists at address.');
+            return true;
+        }
+    } catch (error) {
+        console.error('Error verifying contract:', error);
+        return false;
+    }
+};
+
 // Connect wallet
 export const connectWallet = async () => {
     try {
@@ -86,12 +119,12 @@ export const connectWallet = async () => {
             throw new Error('No accounts found');
         }
 
-        // Check if on Holesky network
-        const isCorrectNetwork = await isHoleskyNetwork();
+        // Check if on Sepolia network
+        const isCorrectNetwork = await isSepoliaNetwork();
         if (!isCorrectNetwork) {
-            toast.loading('Switching to Holesky network...', { id: 'network' });
-            await switchToHoleskyNetwork();
-            toast.success('Connected to Holesky network', { id: 'network' });
+            toast.loading('Switching to Sepolia network...', { id: 'network' });
+            await switchToSepoliaNetwork();
+            toast.success('Connected to Sepolia network', { id: 'network' });
         }
 
         // Initialize provider and signer
@@ -132,8 +165,8 @@ export const registerUser = async () => {
     try {
         // First check if we're on the correct network
         const chainId = await window.ethereum.request({ method: 'eth_chainId' });
-        if (chainId !== '0x4268') { // Holesky testnet chain ID
-            throw new Error('Please switch to Holesky testnet to register');
+        if (chainId !== '0xaa36a7') { // Sepolia testnet chain ID
+            throw new Error('Please switch to Sepolia testnet to register');
         }        // Get fresh contract instance
         const contractInstance = await getContract();
 
@@ -171,11 +204,11 @@ export const registerUser = async () => {
         } else if (error.message.includes('user rejected')) {
             toast.error('Transaction cancelled by user', { id: 'registration' });
         } else if (error.message.includes('insufficient funds')) {
-            toast.error('Insufficient ETH for transaction. Please add Holesky testnet ETH.', { id: 'registration' });
+            toast.error('Insufficient ETH for transaction. Please add Sepolia testnet ETH.', { id: 'registration' });
         } else if (error.message.includes('already registered')) {
             toast.error('User already registered', { id: 'registration' });
         } else if (error.message.includes('network')) {
-            toast.error('Please switch to Holesky testnet', { id: 'registration' });
+            toast.error('Please switch to Sepolia testnet', { id: 'registration' });
         } else {
             toast.error('Registration failed: ' + (error.reason || error.message), { id: 'registration' });
         }
@@ -190,6 +223,13 @@ export const checkUserRegistration = async (address) => {
         const contractInstance = getReadOnlyContract();
         return await contractInstance.isUserRegistered(address);
     } catch (error) {
+        if (error.code === 'BAD_DATA' && error.value === '0x') {
+            console.error('❌ Contract not found at address:', CONTRACT_ADDRESS);
+            console.error('Please verify:');
+            console.error('1. Contract is deployed on Sepolia testnet');
+            console.error('2. Contract address is correct in .env file');
+            console.error('3. You are connected to Sepolia network (Chain ID: 11155111)');
+        }
         console.error('Error checking user registration:', error);
         return false;
     }
@@ -201,6 +241,9 @@ export const checkUserAdmin = async (address) => {
         const contractInstance = getReadOnlyContract();
         return await contractInstance.isUserAdmin(address);
     } catch (error) {
+        if (error.code === 'BAD_DATA' && error.value === '0x') {
+            console.error('❌ Contract not found at address:', CONTRACT_ADDRESS);
+        }
         console.error('Error checking admin status:', error);
         return false;
     }
@@ -361,6 +404,19 @@ export const getComplaintStats = async () => {
         const contractInstance = getReadOnlyContract();
         return await contractInstance.getComplaintStats();
     } catch (error) {
+        if (error.code === 'BAD_DATA' && error.value === '0x') {
+            console.error('⚠️ CONTRACT NOT FOUND!');
+            console.error('Contract Address:', CONTRACT_ADDRESS);
+            console.error('Expected Network: Sepolia (Chain ID: 11155111)');
+            console.error('\nPossible causes:');
+            console.error('1. Contract not deployed at this address on Sepolia');
+            console.error('2. Wrong network selected in MetaMask');
+            console.error('3. Incorrect contract address in .env file');
+            console.error('\nVerify at: https://sepolia.etherscan.io/address/' + CONTRACT_ADDRESS);
+
+            // Return empty stats instead of throwing
+            return { total: 0n, pending: 0n, inProgress: 0n, resolved: 0n };
+        }
         console.error('Error fetching complaint stats:', error);
         throw error;
     }
@@ -398,6 +454,7 @@ const ethereumConfig = {
     getComplaintStats,
     formatAddress,
     formatTimestamp,
+    verifyContractDeployment,
 };
 
 export default ethereumConfig;

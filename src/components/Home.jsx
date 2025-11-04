@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useWeb3 } from '../context/Web3Context';
-import { getComplaintStats } from '../utils/ethereum';
+import { getComplaintStats, verifyContractDeployment } from '../utils/ethereum';
 import {
     ShieldCheckIcon,
     PhoneIcon,
@@ -22,10 +22,17 @@ const Home = () => {
         resolved: 0,
     });
     const [statsLoading, setStatsLoading] = useState(false);
+    const [contractVerified, setContractVerified] = useState(false);
 
     useEffect(() => {
+        verifyContract();
         loadStats();
     }, []);
+
+    const verifyContract = async () => {
+        const isDeployed = await verifyContractDeployment();
+        setContractVerified(isDeployed);
+    };
 
     const loadStats = async () => {
         try {
